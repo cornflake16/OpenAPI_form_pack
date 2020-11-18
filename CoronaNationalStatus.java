@@ -130,7 +130,7 @@ class CoronaNationalStatus {
         UTF = "UTF-8";
         SERVICE_URL = "http://openapi.data.go.kr/openapi/service/rest/Covid19/" +
                 "getCovid19NatInfStateJson";
-        SERVICE_KEY = "=";  //보건복지부_코로나19_국내_발생현황_일반인증키(UTF-8)
+        SERVICE_KEY = "=";  //보건복지부_코로나19_해외_발생현황_일반인증키(UTF-8)
 
         dateFormatForComp = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         dateFormat_year = new SimpleDateFormat("yyyy", Locale.getDefault());
