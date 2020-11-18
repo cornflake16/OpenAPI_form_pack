@@ -117,8 +117,10 @@ class CoronaNationalStatus {
     static int[] days;
     static int nYear, nMonth, nDay, nHour;
 
-    //정보 변수
+    //정보 변수(다른 곳에 활용할때는 이 변수들을 활용하면 됨)
     static int todayTotalNatDefCnt, todayTotalNatDeathCnt, yestTotalDefCnt, yestNatDeathCnt;
+
+    //파싱관련 변수
     static Element body, items, item;
     static Node areaNm, areaNmEn, nationNm, nationNmEn, natDefCnt, natDeathCnt, natDeathRate, createDt, stdDt;
     static ArrayList<NationInfo> natInfoList = new ArrayList<>();
@@ -348,5 +350,3 @@ class CoronaNationalStatus {
         parseXML();
     }
 }
-
-
