@@ -23,14 +23,14 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 class NationInfo {
-    private String areaNm;
-    private String areaNmEn;
-    private String nationNm;
-    private String nationNmEn;
-    private long natDefCnt;
-    private long natDeathCnt;
-    private double natDeathRate;
-    private String createDt;
+    private String areaNm;          //지역(대륙)명
+    private String areaNmEn;        //지역명_영문
+    private String nationNm;        //국가명
+    private String nationNmEn;      //국가명_영문
+    private long natDefCnt;         //확진자 수(국가별)
+    private long natDeathCnt;       //사망자 수(국가별)
+    private double natDeathRate;    //확진자 수 대비 사망자 수(국가별)
+    private String createDt;        //등록일시
 
     public String getAreaNm() {
         return areaNm;
@@ -99,28 +99,37 @@ class NationInfo {
 }
 
 class CoronaNationalStatus {
+    //URL 관련 변수
     static String urlBuilder;
-    static String UTF = "UTF-8";
-    static String SERVICE_URL = "http://openapi.data.go.kr/openapi/service/rest/Covid19/" +
-            "getCovid19NatInfStateJson";
-    static String SERVICE_KEY = "="; //보건복지부_코로나19해외발생_현황 일반 인증키(UTF-8)
+    static String UTF;
+    static String SERVICE_URL;
+    static String SERVICE_KEY;
+
+    //포맷 변수
     static DecimalFormat formatter;
-    static String standardDate = "-";
-
     static SimpleDateFormat dateFormatForComp, dateFormat_year, dateFormat_month, dateFormat_day, dateFormat_hour;
+
+    //날짜 및 시간관련 변수
     static Date time;
+    static String standardDate = "-";
     static String sYear, sMonth, sDay, sHour, sToday, sYesterday, sTwoDayAgo;
-    static String stdYestFromServer, stdTodayFromServer;  //서버에 가장 최근에 데이터가 등록된 날짜
-
+    static String stdYestFromServer, stdTodayFromServer;
+    static int[] days;
     static int nYear, nMonth, nDay, nHour;
-    static int[] days = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    static int todayTotalNatDefCnt, todayTotalNatDeathCnt, yestTotalDefCnt, yestNatDeathCnt;
 
+    //정보 변수
+    static int todayTotalNatDefCnt, todayTotalNatDeathCnt, yestTotalDefCnt, yestNatDeathCnt;
     static Element body, items, item;
     static Node areaNm, areaNmEn, nationNm, nationNmEn, natDefCnt, natDeathCnt, natDeathRate, createDt, stdDt;
     static ArrayList<NationInfo> natInfoList = new ArrayList<>();
 
+    //변수 초기화 하는 함수
     static void init() {
+        UTF = "UTF-8";
+        SERVICE_URL = "http://openapi.data.go.kr/openapi/service/rest/Covid19/" +
+                "getCovid19NatInfStateJson";
+        SERVICE_KEY = "=";  //보건복지부_코로나19_국내_발생현황_일반인증키(UTF-8)
+
         dateFormatForComp = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         dateFormat_year = new SimpleDateFormat("yyyy", Locale.getDefault());
         dateFormat_month = new SimpleDateFormat("MM", Locale.getDefault());
@@ -129,6 +138,8 @@ class CoronaNationalStatus {
         time = new Date();
 
         formatter = new DecimalFormat("###,###");
+
+        days = new int[]{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
         sYear = dateFormat_year.format(time);
         sMonth = dateFormat_month.format(time);
@@ -155,7 +166,8 @@ class CoronaNationalStatus {
         return calDate(nYear, nMonth, nDay, subNum);
     }
 
-    private static String calDate(int year, int month, int day, int subNumber) {   //n일 전의 date 반환하는 함수
+    //오늘 기준으로 n일 전의 날짜를 반환하는 함수
+    private static String calDate(int year, int month, int day, int subNumber) {
         String date;
 
         if (year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)) {    //윤년 계산
@@ -251,7 +263,7 @@ class CoronaNationalStatus {
         }
     }
 
-    private static void XMLParse() {
+    private static void parseXML() {
         loadXML();
         System.out.println("서버기준 오늘: " + stdTodayFromServer);
         System.out.println("서버기준 어제: " + stdYestFromServer);
@@ -303,7 +315,7 @@ class CoronaNationalStatus {
             System.out.println("확진자 수: " + formatter.format(natInfo.getNatDefCnt()) + "명");
             System.out.println("사망자 수: " + formatter.format(natInfo.getNatDeathCnt()) + "명");
             System.out.println("확진자 대비 사망률: " + Math.round(natInfo.getNatDeathRate() * 100) / 100.00 + "%");
-            System.out.println("등록일자: " + natInfo.getCreateDt().substring(0, 19));
+            System.out.println("등록일: " + natInfo.getCreateDt().substring(0, 19));
 
             if (stdTodayFromServer.equals(natInfo.getCreateDt().substring(0, 10))) {
                 todayTotalNatDefCnt += natInfo.getNatDefCnt();
@@ -333,7 +345,7 @@ class CoronaNationalStatus {
 
     public static void main(String[] args) {
         init();
-        XMLParse();
+        parseXML();
     }
 }
 
