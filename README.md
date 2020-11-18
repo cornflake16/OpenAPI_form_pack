@@ -1,10 +1,9 @@
 # **오픈 API 양식 샘플 코드**
 
- (개요)
-    Open API를 활용하기 위한 샘플 코드 모음입니다.
-    
 
-### 공공데이터포털 (http://data.go.kr)
+<pre>(개요)<br>&nbsp;&nbsp;&nbsp;Open API를 활용하기 위한 샘플 코드 모음입니다.</pre>
+
+## 공공데이터포털 (http://data.go.kr)
 	 
 
  - (사용법)
