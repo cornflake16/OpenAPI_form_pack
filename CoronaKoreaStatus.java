@@ -129,7 +129,7 @@ class CoronaKoreaStatus {
         dateFormat_hour = new SimpleDateFormat("HH", Locale.getDefault());
         time = new Date();
 
-        formatter = new DecimalFormat("###,###");
+        formatter = new DecimalFormat("###,###.#");
 
         days = new int[]{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
@@ -164,6 +164,7 @@ class CoronaKoreaStatus {
         examIncCntList = new ArrayList<>();
         clearIncCntList = new ArrayList<>();
         deathIncCntList = new ArrayList<>();
+
         decideTotIncCntForAWeek = examTotIncCntForAWeek = clearTotIncCntForAWeek = deathTotIncCntForAWeek = 0;
     }
 
@@ -217,7 +218,7 @@ class CoronaKoreaStatus {
     }
 
     private static void loadXML() {
-        int nWeekAgo = 6,
+        int nWeekAgo = 7,
                 nToday = 0;
         for (int i = 0; i < 2; i++) {
             try {
@@ -254,7 +255,7 @@ class CoronaKoreaStatus {
             if (i == 0) {
                 if (!sTmpCreateDt.substring(0, 10).equals(sToday)) {
                     System.out.println(sTmpCreateDt.substring(0, 10) + "-" + sToday);
-                    nWeekAgo = 7;
+                    nWeekAgo = 8;
                     nToday = 1;
                     stdYestFromServer = sTwoDayAgo;
                     stdTodayFromServer = sYesterday;
@@ -332,19 +333,17 @@ class CoronaKoreaStatus {
         clearIncCnt = clearIncCntList.get(0);
         deathIncCnt = deathIncCntList.get(0);
 
-        //한 주 동안의 증가 값들의 총합을 구하기 위한 반복문
-        for (int j = 0; j < WEEKDAY_NUMBER - 1; j++) {
-            decideTotIncCntForAWeek += decideIncCntList.get(j);
-            examTotIncCntForAWeek += examIncCntList.get(j);
-            clearTotIncCntForAWeek += clearIncCntList.get(j);
-            deathTotIncCntForAWeek += deathIncCntList.get(j);
-        }
+        //한 주 동안의 증가 값들의 총합을 구하기 위한 연산
+        decideTotIncCntForAWeek += decideCntList.get(0) - decideCntList.get((int)WEEKDAY_NUMBER);
+        examTotIncCntForAWeek += examCntList.get(0) - examCntList.get((int)WEEKDAY_NUMBER);
+        clearTotIncCntForAWeek += clearCntList.get(0) - clearCntList.get((int)WEEKDAY_NUMBER);
+        deathTotIncCntForAWeek += deathCntList.get(0) - deathCntList.get((int)WEEKDAY_NUMBER);
 
         //한 주 동안의 증가 값들의 평균 값을 구하기 위한 연산
-        decideAvgIncCntForAWeek = decideTotIncCntForAWeek / WEEKDAY_NUMBER - 1.0;
-        examAvgIncCntForAWeek = examTotIncCntForAWeek / WEEKDAY_NUMBER - 1.0;
-        clearAvgIncCntForAWeek = clearTotIncCntForAWeek / WEEKDAY_NUMBER - 1.0;
-        deathAvgIncCntForAWeek = deathTotIncCntForAWeek / WEEKDAY_NUMBER - 1.0;
+        decideAvgIncCntForAWeek = decideTotIncCntForAWeek / WEEKDAY_NUMBER;
+        examAvgIncCntForAWeek = examTotIncCntForAWeek / WEEKDAY_NUMBER;
+        clearAvgIncCntForAWeek = clearTotIncCntForAWeek / WEEKDAY_NUMBER;
+        deathAvgIncCntForAWeek = deathTotIncCntForAWeek / WEEKDAY_NUMBER;
     }
 
     private static void printInfo() {
@@ -353,37 +352,37 @@ class CoronaKoreaStatus {
         System.out.println("\t(확진자)");
         System.out.println("\t\t - 확진자 수(누적): " + formatter.format(decideCntList.get(0)) + "명");
         System.out.println("\t\t - 확진자 증가 수(전일 대비): " + formatter.format(decideIncCnt) + "명");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일 총합 "
+        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 총합 "
                 + formatter.format(decideTotIncCntForAWeek) + "명의 확진자 추가");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일 평균 "
+        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 평균 약 "
                 + formatter.format(decideAvgIncCntForAWeek) + "명의 확진자 추가");
-        System.out.println("---");
+        System.out.println();
 
         System.out.println("\t(검사진행)");
         System.out.println("\t\t - 검사진행 수(누적): " + formatter.format(examCntList.get(0)) + "명");
         System.out.println("\t\t - 검사진행 증가 수(전일 대비): " + formatter.format(examIncCnt) + "명");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일 총합 "
+        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 총합 "
                 + formatter.format(examTotIncCntForAWeek) + "명의 검사자 추가");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일 평균 "
+        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 평균 약 "
                 + formatter.format(examAvgIncCntForAWeek) + "명의 검사자 추가");
-        System.out.println("---");
+        System.out.println();
 
         System.out.println("\t(격리해제)");
         System.out.println("\t\t - 격리해제 수(누적): " + formatter.format(clearCntList.get(0)) + "명");
         System.out.println("\t\t - 격리해제 증가 수(전일 대비): " + formatter.format(clearIncCnt) + "명");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일 총합 "
+        System.out.println("\t\t - " + WEEKDAY_NUMBER + "일간 일일 총합 "
                 + formatter.format(clearTotIncCntForAWeek) + "명의 격리해제 추가");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일 평균 "
+        System.out.println("\t\t - " + WEEKDAY_NUMBER + "일간 일일 평균 약 "
                 + formatter.format(clearAvgIncCntForAWeek) + "명의 격리해제 추가");
-        System.out.println("---");
+        System.out.println();
 
 
         System.out.println("\t(사망자)");
         System.out.println("\t\t - 사망자 수(누적): " + formatter.format(deathCntList.get(0)) + "명");
         System.out.println("\t\t - 사망자 증가 수(전일 대비): " + formatter.format(deathIncCnt) + "명");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일 총합 "
+        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 총합 "
                 + formatter.format(deathTotIncCntForAWeek) + "명의 사망자 추가");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일 평균 "
+        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 평균 약 "
                 + formatter.format(deathAvgIncCntForAWeek) + "명의 사망자 추가");
         System.out.println("---");
 
