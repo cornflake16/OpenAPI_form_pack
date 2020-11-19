@@ -355,7 +355,7 @@ class CoronaRegionalStatus {
             regionInfoList.add(regionInfo);
         }
         //검역 요소가 있는 인덱스의 값과 리스트의 맨 마지막의 값을 스와핑 후에
-        //시도별 확진자 수(defCnt)에 따라 regionInfoList 재 정렬
+        //시도별 확진자 수(defCnt)에 따라 regionInfoList 내림차순 정렬
         Collections.swap(regionInfoList, 0, regionInfoList.size() - 1);
         regionInfoList.subList(0, regionInfoList.size() - 1).sort(Collections.reverseOrder());
 
