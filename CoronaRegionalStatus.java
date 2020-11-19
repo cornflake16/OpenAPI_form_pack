@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
-class RegionInfo implements Comparable<RegionInfo> {
+class RegionInfo implements Comparable<RegionInfo> {    //확진자에 따른 내림차순 정렬
     private String gubun;       //시도명_한글
     private String gubunEn;     //시도명_영문
 
@@ -257,8 +257,14 @@ class CoronaRegionalStatus {
     }
 
     private static void loadXML() {
-        int nWeekAgo = 0,
-                nToday = 0;
+        /*
+          금일을 기준으로 한 데이터를 수신하더라도 nWeekAgo, nToday 값이 일치하면 안됨.
+          자정 ~ 업데이트 시점(다음 날)에 특정 element 를 수신하는데 널 포인터 예외가 날 수 있으므로,
+          항상 (nWeekAgo - nToday > 0)을 만족해야함. 요청 받은 값을 리스트에 넣을 때,
+          금일을 기준으로 한 값만 도출하기 위해, 조건문을 사용하여 서버로부터 요청 받은 등록일자(요소)의 일자 부분과
+          Date 클래스를 사용하여 얻은 금일의 일자(포맷을 일치시켜서 비교)가 일치하는 경우에만 값을 삽입하도록 하면됨
+         */
+        int nWeekAgo = 1, nToday = 0;
         for (int i = 0; i < 2; i++) {
             try {
                 urlBuilder = SERVICE_URL + "?" + URLEncoder.encode("ServiceKey", UTF) + SERVICE_KEY + /*Service Key*/
@@ -283,18 +289,15 @@ class CoronaRegionalStatus {
             } catch (IOException | SAXException | ParserConfigurationException e) {
                 System.out.println("CoronaRegionalStatus()" + e.getMessage());
             }
-
             assert doc != null;
             body = (Element) doc.getElementsByTagName("body").item(0);
             items = (Element) body.getElementsByTagName("items").item(0);
             item = (Element) items.getElementsByTagName("item").item(0);
-
             Node tmpCreateDt = item.getElementsByTagName("createDt").item(0);
             String sTmpCreateDt = tmpCreateDt.getChildNodes().item(0).getNodeValue();
             if (i == 0) {
                 if (!sTmpCreateDt.substring(0, 10).equals(sToday)) {
-                    System.out.println(sTmpCreateDt.substring(0, 10) + "-" + sToday);
-                    nWeekAgo = 1;
+                    nWeekAgo = 2;
                     nToday = 1;
                     stdYestFromServer = sTwoDayAgo;
                     stdTodayFromServer = sYesterday;
@@ -357,27 +360,30 @@ class CoronaRegionalStatus {
         regionInfoList.subList(0, regionInfoList.size() - 1).sort(Collections.reverseOrder());
 
         for (RegionInfo regionInfo : regionInfoList) {
-            System.out.println("----------------------------------------");
-            System.out.println("등록일시: " + regionInfo.getCreateDt().substring(0, 19));
-            System.out.println("수정일시: " + regionInfo.getUpdateDt());
-            System.out.println("지역명: " + regionInfo.getGubun());
-            System.out.println("지역명(영문): " + regionInfo.getGubunEn() + '\n');
-            System.out.println("(누적)");
-            System.out.println(" - 확진자 수: " + formatter.format(regionInfo.getDefCnt())
-                    + "명(+" + regionInfo.getIncDec() + ")");
-            System.out.println(" - 격리해제 수: " + formatter.format(regionInfo.getIsolClearCnt()) + "명");
-            System.out.println(" - 격리중 환자 수: " + formatter.format(regionInfo.getIsolIngCnt()) + "명");
-            System.out.println(" - 사망자 수: " + formatter.format(regionInfo.getDeathCnt()) + "명");
+            String sCreateDt = regionInfo.getCreateDt().substring(0, 10);
+            if (sCreateDt.equals(stdTodayFromServer)) {
+                System.out.println("----------------------------------------");
+                System.out.println("등록일시: " + regionInfo.getCreateDt().substring(0, 19));
+                System.out.println("수정일시: " + regionInfo.getUpdateDt());
+                System.out.println("지역명: " + regionInfo.getGubun());
+                System.out.println("지역명(영문): " + regionInfo.getGubunEn() + '\n');
+                System.out.println("(누적)");
+                System.out.println(" - 확진자 수: " + formatter.format(regionInfo.getDefCnt())
+                        + "명(+" + regionInfo.getIncDec() + ")");
+                System.out.println(" - 격리해제 수: " + formatter.format(regionInfo.getIsolClearCnt()) + "명");
+                System.out.println(" - 격리중 환자 수: " + formatter.format(regionInfo.getIsolIngCnt()) + "명");
+                System.out.println(" - 사망자 수: " + formatter.format(regionInfo.getDeathCnt()) + "명");
 
-            gubunList.add(regionInfo.getGubun());
-            gubunEnList.add(regionInfo.getGubunEn());
-            defCntList.add(regionInfo.getDefCnt());
-            isolIngCntList.add(regionInfo.getIsolIngCnt());
-            isolClearCntList.add(regionInfo.getIsolClearCnt());
-            deathCntList.add(regionInfo.getDeathCnt());
-            incDecList.add(regionInfo.getIncDec());
-            createDtList.add(regionInfo.getCreateDt());
-            updateDtList.add(regionInfo.getUpdateDt());
+                gubunList.add(regionInfo.getGubun());
+                gubunEnList.add(regionInfo.getGubunEn());
+                defCntList.add(regionInfo.getDefCnt());
+                isolIngCntList.add(regionInfo.getIsolIngCnt());
+                isolClearCntList.add(regionInfo.getIsolClearCnt());
+                deathCntList.add(regionInfo.getDeathCnt());
+                incDecList.add(regionInfo.getIncDec());
+                createDtList.add(regionInfo.getCreateDt());
+                updateDtList.add(regionInfo.getUpdateDt());
+            }
         }
     }
 
