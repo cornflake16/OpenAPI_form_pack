@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.Locale;
 
 class RegionInfo {
-    private String gubun;       //시도명(한글)
-    private String gubunEn;     //시도명(영문)
+    private String gubun;       //시도명_한글
+    private String gubunEn;     //시도명_영문
 
     private long defCnt;        //확진자 수
     private long isolClearCnt;  //격리해제 수
@@ -127,8 +127,21 @@ class CoronaRegionalStatus {
     static int[] days;
     static int nYear, nMonth, nDay, nHour;
 
+    //정보 변수(다른 곳에 활용할때는 이 변수들을 활용하면 됨)
+    /*
+        gubunList: 시도명(한글)이 시도별로 담겨 있는 리스트
+        gubunEnList: 시도명(영문)이 시도별로 담겨 있는 리스트
+        defCntList: 시도별 확진자가 저장되어 있는 리스트
+        isolIngCntList: 시도별 격리중인 환자 수가 저장되어 있는 리스트
+        isolClearCntList: 시도별 격리해제 수가 저장되어 있는 리스트
+        deathCntList: 시도별 사망자 수가 저장되어 있는 리스트
+        incDecList: 시도별 전일 대비 증감 수가 저장되어 있는 리스트
+
+        createDtList: 등록일시 (ex. 2020-11-19 09:10:13)가 저장되어 있는 리스트
+        updateDtList: 업데이트일시 (ex. 2020-11-19 09:10:13)가 저장되어 있는 리스트
+     */
     static ArrayList<String> gubunList, gubunEnList;
-    static ArrayList<Long> defCntList, overFlowCntList, localOccCntList, isolClearCntList, isolIngCntList, deathCntList;
+    static ArrayList<Long> defCntList, isolClearCntList, isolIngCntList, deathCntList;
     static ArrayList<Integer> incDecList;
     static ArrayList<String> createDtList, updateDtList;
 
@@ -179,10 +192,8 @@ class CoronaRegionalStatus {
         gubunList = new ArrayList<>();
         gubunEnList = new ArrayList<>();
         defCntList = new ArrayList<>();
-        overFlowCntList = new ArrayList<>();
-        localOccCntList = new ArrayList<>();
-        isolClearCntList = new ArrayList<>();
         isolIngCntList = new ArrayList<>();
+        isolClearCntList = new ArrayList<>();
         deathCntList = new ArrayList<>();
         incDecList = new ArrayList<>();
         createDtList = new ArrayList<>();
@@ -318,7 +329,7 @@ class CoronaRegionalStatus {
 
             regionInfo.setCreateDt(createDt.getChildNodes().item(0).getNodeValue());
             String sUpdateDt = updateDt.getChildNodes().item(0).getNodeValue();
-            if(sUpdateDt.equals("null")) {
+            if (sUpdateDt.equals("null")) {
                 sUpdateDt = "수정내역 없음";
             }
             regionInfo.setUpdateDt(sUpdateDt);
@@ -327,7 +338,6 @@ class CoronaRegionalStatus {
         }
 
         for (RegionInfo regionInfo : regionInfoList) {
-
             System.out.println("----------------------------------------");
             System.out.println("등록일시: " + regionInfo.getCreateDt().substring(0, 19));
             System.out.println("수정일시: " + regionInfo.getUpdateDt());
