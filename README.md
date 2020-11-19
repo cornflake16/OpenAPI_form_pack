@@ -21,7 +21,7 @@
     
      &nbsp; => [**[참고 문서]**](https://github.com/cornflake16/OpenAPI_form_pack/blob/main/docs/01.보건복지부_OpenAPI활용가이드_코로나바이러스감염증_감염현황%20조회%20서비스_v0.3%20(11).docx) [**[참고 페이지]**](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15043376)
 
-	- [CoronaRegionalStatus.java]: 코로나 시·도 발생 현황_XML 파싱(DOM 방식)_주석 추가 예정
+	- [CoronaRegionalStatus.java](https://github.com/cornflake16/OpenAPI_form_pack/blob/main/CoronaRegionalStatus): 코로나 시·도 발생 현황_XML 파싱(DOM 방식)_주석 추가 예정
     
      &nbsp; => [**[참고 문서]**](https://github.com/cornflake16/OpenAPI_form_pack/blob/main/docs/03.보건복지부_OpenAPI활용가이드_코로나바이러스감염증_시도발생_현황%20조회%20서비스_v0.3%20(2).docx) [**[참고 페이지]**](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15043378)
 
