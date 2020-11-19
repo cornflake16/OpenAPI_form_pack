@@ -21,7 +21,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-class NationInfo {
+class NationInfo implements Comparable<NationInfo>{
     private String areaNm;          //지역(대륙)명
     private String areaNmEn;        //지역명_영문
     private String nationNm;        //국가명
@@ -95,6 +95,15 @@ class NationInfo {
         this.createDt = createDt;
     }
 
+    @Override
+    public int compareTo(NationInfo o) {
+        if (this.natDefCnt < o.getNatDefCnt()) {
+            return -1;
+        } else if (this.natDefCnt > o.getNatDefCnt()) {
+            return 1;
+        }
+        return 0;
+    }
 }
 
 class CoronaNationalStatus {
@@ -118,15 +127,22 @@ class CoronaNationalStatus {
 
     //정보 변수(다른 곳에 활용할때는 이 변수들을 활용하면 됨)
     /*
-        todayTotalNatDefCnt: 금일 누적 전세계 확진자 수
-        todayTotalNatDefCnt: 금일 누적 전세계 사망자 수
+        todayTotalNatDefCnt: 금일 누적 전세계 확진자 수(정수형)
+        todayTotalNatDefCnt: 금일 누적 전세계 사망자 수(정수형)
         natDefIncCnt: 전일 대비 확진자 증가 수(금일 기준)
         natDeathIncCnt: 전일 대비 사망자 증가 수(금일 기준)
+        => newFmt_todayTotNatDefCnt: 금일 누적 전세계 확진자 수(포맷 적용된 문자열)
+        newFmt_todayTotNatDeathCnt: 금일 누적 전세계 사망자 수(포맷 적용된 문자열)
+        newFmt_natDefIncCnt: 전일 대비 확진자 증가 수(포맷 적용된 문자열)
+        newFmt_natDeathIncCnt: 전일 대비 사망자 증가 수(포맷 적용된 문자열)
+
         totalDefNatCnt: 감염국가 수
         newFormatStateDate: 등록 기준일시 (ex. 2020-11-19 09)
      */
     static long todayTotalNatDefCnt, todayTotalNatDeathCnt, yestTotalDefCnt, yestNatDeathCnt;
+    static String newFmt_todayTotNatDefCnt, newFmt_todayTotNatDeathCnt;
     static long natDefIncCnt, natDeathIncCnt;
+    static String newFmt_natDefIncCnt, newFmt_natDeathIncCnt;
     static int totalDefNatCnt;
     static String newFormatStateDate;
 
@@ -140,7 +156,7 @@ class CoronaNationalStatus {
         UTF = "UTF-8";
         SERVICE_URL = "http://openapi.data.go.kr/openapi/service/rest/Covid19/" +
                 "getCovid19NatInfStateJson";
-        SERVICE_KEY = "=";  //보건복지부_코로나19_국내_발생현황_일반인증키(UTF-8)
+        SERVICE_KEY = "=";  //보건복지부_코로나19_해외_발생현황_일반인증키(UTF-8)
 
         dateFormatForComp = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         dateFormat_year = new SimpleDateFormat("yyyy", Locale.getDefault());
@@ -218,10 +234,6 @@ class CoronaNationalStatus {
         }
 
         return date;
-    }
-
-    CoronaNationalStatus(DecimalFormat formatter) {
-        CoronaNationalStatus.formatter = formatter;
     }
 
     private static void loadXML() {
@@ -312,6 +324,7 @@ class CoronaNationalStatus {
 
             natInfoList.add(nationInfo);
         }
+        natInfoList.sort(Collections.reverseOrder());
 
         int n = 0;
         todayTotalNatDefCnt = todayTotalNatDeathCnt = 0;
@@ -342,6 +355,10 @@ class CoronaNationalStatus {
         newFormatStateDate = stateDate.substring(0, 4) + '-' + stateDate.substring(6, 8)
                 + '-' + stateDate.substring(10, 12) + ' ' + stateDate.substring(14, 16) + "시";
 
+        newFmt_todayTotNatDefCnt = formatter.format(todayTotalNatDefCnt);
+        newFmt_todayTotNatDeathCnt = formatter.format(todayTotalNatDeathCnt);
+        newFmt_natDefIncCnt = formatter.format((natDefIncCnt));
+        newFmt_natDeathIncCnt = formatter.format((natDeathIncCnt));
     }
 
     private static void printInfo() {
@@ -349,12 +366,13 @@ class CoronaNationalStatus {
         System.out.println("[ 정리 ]");
         System.out.println("기준일시: " + newFormatStateDate);
         System.out.println("현재 시간: " + nHour + "시(24시기준)");
-        System.out.println("총 확진자 수: " + formatter.format(todayTotalNatDefCnt) + "명");
-        System.out.println("총 사망자 수: " + formatter.format(todayTotalNatDeathCnt) + "명");
-        System.out.println("총 확진자 증가 수(전일대비 기준): " + formatter.format((natDefIncCnt)) + "명");
-        System.out.println("총 사망자 증가 수(전일대비 기준): " + formatter.format((natDeathIncCnt)) + "명");
+        System.out.println("총 확진자 수: " + newFmt_todayTotNatDefCnt + "명");
+        System.out.println("총 사망자 수: " + newFmt_todayTotNatDeathCnt + "명");
+        System.out.println("총 확진자 증가 수(전일대비 기준): " + newFmt_natDefIncCnt + "명");
+        System.out.println("총 사망자 증가 수(전일대비 기준): " + newFmt_natDeathIncCnt + "명");
         System.out.println("감염국가 수: " + totalDefNatCnt);
     }
+
     public static void main(String[] args) {
         init();
         parseXML();
