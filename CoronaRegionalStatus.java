@@ -20,10 +20,11 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
-class RegionInfo {
+class RegionInfo implements Comparable<RegionInfo> {
     private String gubun;       //시도명_한글
     private String gubunEn;     //시도명_영문
 
@@ -106,6 +107,16 @@ class RegionInfo {
 
     public void setUpdateDt(String updateDt) {
         this.updateDt = updateDt;
+    }
+
+    @Override
+    public int compareTo(RegionInfo o) {
+        if (this.defCnt < o.getDefCnt()) {
+            return -1;
+        } else if (this.defCnt > o.getDefCnt()) {
+            return 1;
+        }
+        return 0;
     }
 }
 
@@ -319,7 +330,11 @@ class CoronaRegionalStatus {
             createDt = item.getElementsByTagName("createDt").item(0);    //등록일시
             updateDt = item.getElementsByTagName("updateDt").item(0);    //등록일시
 
-            regionInfo.setGubun(gubun.getChildNodes().item(0).getNodeValue());
+            String sGubun = gubun.getChildNodes().item(0).getNodeValue();
+            if (sGubun.equals("합계")) {
+                continue;
+            }
+            regionInfo.setGubun(sGubun);
             regionInfo.setGubunEn(gubunEn.getChildNodes().item(0).getNodeValue());
             regionInfo.setDefCnt(Long.parseLong(defCnt.getChildNodes().item(0).getNodeValue()));
             regionInfo.setIsolClearCnt(Long.parseLong(isolClearCnt.getChildNodes().item(0).getNodeValue()));
@@ -336,6 +351,10 @@ class CoronaRegionalStatus {
 
             regionInfoList.add(regionInfo);
         }
+        //검역 요소가 있는 인덱스의 값과 리스트의 맨 마지막의 값을 스와핑 후에
+        //시도별 확진자 수(defCnt)에 따라 regionInfoList 재 정렬
+        Collections.swap(regionInfoList, 0, regionInfoList.size() - 1);
+        regionInfoList.subList(0, regionInfoList.size() - 1).sort(Collections.reverseOrder());
 
         for (RegionInfo regionInfo : regionInfoList) {
             System.out.println("----------------------------------------");
@@ -343,11 +362,12 @@ class CoronaRegionalStatus {
             System.out.println("수정일시: " + regionInfo.getUpdateDt());
             System.out.println("지역명: " + regionInfo.getGubun());
             System.out.println("지역명(영문): " + regionInfo.getGubunEn() + '\n');
-            System.out.println(" - 확진자 수: " + formatter.format(regionInfo.getDefCnt()) + "명");
+            System.out.println("(누적)");
+            System.out.println(" - 확진자 수: " + formatter.format(regionInfo.getDefCnt())
+                    + "명(+" + regionInfo.getIncDec() + ")");
             System.out.println(" - 격리해제 수: " + formatter.format(regionInfo.getIsolClearCnt()) + "명");
             System.out.println(" - 격리중 환자 수: " + formatter.format(regionInfo.getIsolIngCnt()) + "명");
             System.out.println(" - 사망자 수: " + formatter.format(regionInfo.getDeathCnt()) + "명");
-            System.out.println(" - 전일대비 증가 수: " + formatter.format(regionInfo.getIncDec()) + "명");
 
             gubunList.add(regionInfo.getGubun());
             gubunEnList.add(regionInfo.getGubunEn());
