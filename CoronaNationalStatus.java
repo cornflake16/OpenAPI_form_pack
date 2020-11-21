@@ -375,7 +375,7 @@ class CoronaNationalStatus {
         System.out.println(" - 감염국가 수: " + totalDefNatCnt);
     }
 
-//    public  void main(String[] args) {
+//    public static void main(String[] args) {
 //        init();
 //        parseXML();
 //        printInfo();
