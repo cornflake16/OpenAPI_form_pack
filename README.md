@@ -28,3 +28,5 @@
 	- [CoronaNationalStatus.java](https://github.com/cornflake16/OpenAPI_form_pack/blob/main/CoronaNationalStatus.java): 코로나 해외 발생 현황_XML 파싱(DOM 방식)_주석 추가 예정
     
      &nbsp; => [**[참고 문서]**](https://github.com/cornflake16/OpenAPI_form_pack/blob/main/docs/04.보건복지부_OpenAPI활용가이드_코로나바이러스감염증_해외발생_현황%20조회%20서비스_v0.3.docx) [**[참고 페이지]**](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15043379)
+
+=> 해당 클래스만 빌드하려면 모든 메서드와 변수를 static으로 선언하고 main메서드 주석 해제
