@@ -72,55 +72,55 @@ class DailyInfo {
 }
 
 class CoronaKoreaStatus {
-    final static double WEEKDAY_NUMBER = 7.0;
+    final double WEEKDAY_NUMBER = 7.0;
     //URL 관련 변수
-    static String urlBuilder;
-    static String UTF;
-    static String SERVICE_URL;
-    static String SERVICE_KEY;
+    String urlBuilder;
+    String UTF;
+    String SERVICE_URL;
+    String SERVICE_KEY;
 
     //포맷 변수
-    static DecimalFormat formatter;
-    static SimpleDateFormat dateFormatForComp, dateFormat_year, dateFormat_month, dateFormat_day, dateFormat_hour;
+    DecimalFormat formatter;
+    SimpleDateFormat dateFormatForComp, dateFormat_year, dateFormat_month, dateFormat_day, dateFormat_hour;
 
     //날짜 및 시간관련 변수
-    static Date time;
-    static String sStateDt = "-";
-    static String sYear, sMonth, sDay, sHour, sToday, sYesterday, sTwoDayAgo;
-    static String stdYestFromServer, stdTodayFromServer;
-    static int[] days;
-    static int nYear, nMonth, nDay, nHour;
+    Date time;
+    String sStateDt = "-";
+    String sYear, sMonth, sDay, sHour, sToday, sYesterday, sTwoDayAgo;
+    String stdYestFromServer, stdTodayFromServer;
+    int[] days;
+    int nYear, nMonth, nDay, nHour;
 
     //정보 변수(다른 곳에 활용할때는 이 변수들을 활용하면 됨)
     /*
+        todayStateDate: 등록 기준일시
         createDtList: 일자별 등록일자가 들어 있는 리스트 (ex. 2020-11-19)
         createDtTimeList: 일자별 등록일시가 들어 있는 리스트 (ex. 2020-11-19 09)
         $(x)CntList: 일자별로 x 항목의 값(수치)들을 저장해놓은 리스트(인덱스가 낮을수록 최신 일자의 데이터)
-        $(x)CntToTal: 일주일
         $(x)IncCnt: 금일 기준 전일 대비 x 항목의 증가 값
         $(x)IncCntList: 일자별로 전일대비 증가 값들을 저장해놓은 리스트_총 (day-1)개의 값이 저장되야함 -> ex)7일기준 6개
         $(x)TotIncCntForAWeek: 한 주 동안의 x 항목의 증가 값들의 총합
         $(x)AvgIncCntForAWeek: 한 주 동안의 x 항목의 증가 값들의 평균 값
     */
-
-    static ArrayList<String> createDtList, createDtTimeList;
-    static ArrayList<Long> decideCntList, examCntList, clearCntList, deathCntList;
-    //    static long
-    static long decideIncCnt, examIncCnt, clearIncCnt, deathIncCnt;
-    static ArrayList<Long> decideIncCntList, examIncCntList, clearIncCntList, deathIncCntList;
-    static long decideTotIncCntForAWeek, examTotIncCntForAWeek, clearTotIncCntForAWeek, deathTotIncCntForAWeek;
-    static double decideAvgIncCntForAWeek, examAvgIncCntForAWeek, clearAvgIncCntForAWeek, deathAvgIncCntForAWeek;
+    String todayStateDate;
+    ArrayList<String> createDtList, createDtTimeList;
+    ArrayList<Long> decideCntList, examCntList, clearCntList, deathCntList;
+    long decideIncCnt, examIncCnt, clearIncCnt, deathIncCnt;
+    ArrayList<Long> decideIncCntList, examIncCntList, clearIncCntList, deathIncCntList;
+    long decideTotIncCntForAWeek, examTotIncCntForAWeek, clearTotIncCntForAWeek, deathTotIncCntForAWeek;
+    double decideAvgIncCntForAWeek, examAvgIncCntForAWeek, clearAvgIncCntForAWeek, deathAvgIncCntForAWeek;
 
     //파싱 관련 변수
-    static Element body, items, item;
-    static Node decideCnt, examCnt, clearCnt, deathCnt, createDt, stdDt;
-    static ArrayList<DailyInfo> dailyInfoList;
+    Element body, items, item;
+    Node decideCnt, examCnt, clearCnt, deathCnt, createDt, stdDt;
+    ArrayList<DailyInfo> dailyInfoList;
 
-    static void init() {
+    void init() {
         UTF = "UTF-8";
         SERVICE_URL = "http://openapi.data.go.kr/openapi/service/rest/Covid19/" +
                 "getCovid19InfStateJson";
-        SERVICE_KEY = "=";  //보건복지부_코로나19_국내_발생현황_일반인증키(UTF-8)
+        SERVICE_KEY = "=kC3ljqNBvF0D3D0MgwkBdzUlKztg0V2yJ%2BVkvqsymD0dJNuZmK%" +
+                "2B3LGpamas7GkxZJM07ADoSl6WR%2BdJODqB7sg%3D%3D";  //보건복지부_코로나19_국내_발생현황_일반인증키(UTF-8)
 
         dateFormatForComp = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         dateFormat_year = new SimpleDateFormat("yyyy", Locale.getDefault());
@@ -168,11 +168,11 @@ class CoronaKoreaStatus {
         decideTotIncCntForAWeek = examTotIncCntForAWeek = clearTotIncCntForAWeek = deathTotIncCntForAWeek = 0;
     }
 
-    public static String dayAgo(int subNum) {
+    public String dayAgo(int subNum) {
         return calDate(nYear, nMonth, nDay, subNum);
     }
 
-    private static String calDate(int year, int month, int day, int subNumber) {   //n일 전의 date 반환하는 함수
+    private String calDate(int year, int month, int day, int subNumber) {   //n일 전의 date 반환하는 함수
         String date;
 
         if (year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)) {    //윤년 계산
@@ -213,13 +213,8 @@ class CoronaKoreaStatus {
         return date;
     }
 
-    CoronaKoreaStatus(DecimalFormat formatter) {
-        CoronaKoreaStatus.formatter = formatter;
-    }
-
-    private static void loadXML() {
-        int nWeekAgo = 7,
-                nToday = 0;
+    private void loadXML() {
+        int nWeekAgo = 7, nToday = 0;
         for (int i = 0; i < 2; i++) {
             try {
                 urlBuilder = SERVICE_URL + "?" + URLEncoder.encode("ServiceKey", UTF) + SERVICE_KEY + /*Service Key*/
@@ -237,6 +232,7 @@ class CoronaKoreaStatus {
             Document doc = null;
             try {
                 URL url = new URL(urlBuilder);
+                System.out.println("URL: " + url);
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
                 doc = dBuilder.parse(new InputSource(url.openStream()));
@@ -254,7 +250,6 @@ class CoronaKoreaStatus {
             String sTmpCreateDt = tmpCreateDt.getChildNodes().item(0).getNodeValue();
             if (i == 0) {
                 if (!sTmpCreateDt.substring(0, 10).equals(sToday)) {
-                    System.out.println(sTmpCreateDt.substring(0, 10) + "-" + sToday);
                     nWeekAgo = 8;
                     nToday = 1;
                     stdYestFromServer = sTwoDayAgo;
@@ -268,7 +263,7 @@ class CoronaKoreaStatus {
         }
     }
 
-    private static void parseXML() {
+    private void parseXML() {
         loadXML();
         System.out.println("서버기준 오늘: " + stdTodayFromServer);
         System.out.println("서버기준 어제: " + stdYestFromServer);
@@ -334,36 +329,38 @@ class CoronaKoreaStatus {
         deathIncCnt = deathIncCntList.get(0);
 
         //한 주 동안의 증가 값들의 총합을 구하기 위한 연산
-        decideTotIncCntForAWeek += decideCntList.get(0) - decideCntList.get((int)WEEKDAY_NUMBER);
-        examTotIncCntForAWeek += examCntList.get(0) - examCntList.get((int)WEEKDAY_NUMBER);
-        clearTotIncCntForAWeek += clearCntList.get(0) - clearCntList.get((int)WEEKDAY_NUMBER);
-        deathTotIncCntForAWeek += deathCntList.get(0) - deathCntList.get((int)WEEKDAY_NUMBER);
+        decideTotIncCntForAWeek += decideCntList.get(0) - decideCntList.get((int) WEEKDAY_NUMBER);
+        examTotIncCntForAWeek += examCntList.get(0) - examCntList.get((int) WEEKDAY_NUMBER);
+        clearTotIncCntForAWeek += clearCntList.get(0) - clearCntList.get((int) WEEKDAY_NUMBER);
+        deathTotIncCntForAWeek += deathCntList.get(0) - deathCntList.get((int) WEEKDAY_NUMBER);
 
         //한 주 동안의 증가 값들의 평균 값을 구하기 위한 연산
         decideAvgIncCntForAWeek = decideTotIncCntForAWeek / WEEKDAY_NUMBER;
         examAvgIncCntForAWeek = examTotIncCntForAWeek / WEEKDAY_NUMBER;
         clearAvgIncCntForAWeek = clearTotIncCntForAWeek / WEEKDAY_NUMBER;
         deathAvgIncCntForAWeek = deathTotIncCntForAWeek / WEEKDAY_NUMBER;
+
+        todayStateDate = createDtTimeList.get(0) + "시 기준";
     }
 
-    private static void printInfo() {
+    private void printInfo() {
         System.out.println("----------------------------------------");
         System.out.println("[정보 정리]");
         System.out.println("\t(확진자)");
         System.out.println("\t\t - 확진자 수(누적): " + formatter.format(decideCntList.get(0)) + "명");
         System.out.println("\t\t - 확진자 증가 수(전일 대비): " + formatter.format(decideIncCnt) + "명");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 총합 "
+        System.out.println("\t\t - " + (int) WEEKDAY_NUMBER + "일간 일일 총합 "
                 + formatter.format(decideTotIncCntForAWeek) + "명의 확진자 추가");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 평균 약 "
+        System.out.println("\t\t - " + (int) WEEKDAY_NUMBER + "일간 일일 평균 약 "
                 + formatter.format(decideAvgIncCntForAWeek) + "명의 확진자 추가");
         System.out.println();
 
         System.out.println("\t(검사진행)");
         System.out.println("\t\t - 검사진행 수(누적): " + formatter.format(examCntList.get(0)) + "명");
         System.out.println("\t\t - 검사진행 증가 수(전일 대비): " + formatter.format(examIncCnt) + "명");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 총합 "
+        System.out.println("\t\t - " + (int) WEEKDAY_NUMBER + "일간 일일 총합 "
                 + formatter.format(examTotIncCntForAWeek) + "명의 검사자 추가");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 평균 약 "
+        System.out.println("\t\t - " + (int) WEEKDAY_NUMBER + "일간 일일 평균 약 "
                 + formatter.format(examAvgIncCntForAWeek) + "명의 검사자 추가");
         System.out.println();
 
@@ -380,18 +377,17 @@ class CoronaKoreaStatus {
         System.out.println("\t(사망자)");
         System.out.println("\t\t - 사망자 수(누적): " + formatter.format(deathCntList.get(0)) + "명");
         System.out.println("\t\t - 사망자 증가 수(전일 대비): " + formatter.format(deathIncCnt) + "명");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 총합 "
+        System.out.println("\t\t - " + (int) WEEKDAY_NUMBER + "일간 일일 총합 "
                 + formatter.format(deathTotIncCntForAWeek) + "명의 사망자 추가");
-        System.out.println("\t\t - " + (int)WEEKDAY_NUMBER + "일간 일일 평균 약 "
+        System.out.println("\t\t - " + (int) WEEKDAY_NUMBER + "일간 일일 평균 약 "
                 + formatter.format(deathAvgIncCntForAWeek) + "명의 사망자 추가");
         System.out.println("---");
-
-        System.out.println(createDtTimeList.get(0) + "시 기준");
+        System.out.println(todayStateDate);
     }
 
-    public static void main(String[] args) {
-        init();
-        parseXML();
-        printInfo();
-    }
+//    public static void main(String[] args) {
+//        init();
+//        parseXML();
+//        printInfo();
+//    }
 }
